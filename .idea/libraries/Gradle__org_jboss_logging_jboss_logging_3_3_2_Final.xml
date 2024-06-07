@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: org.jboss.logging:jboss-logging:3.3.2.Final">
+  <library name="Gradle: org.jboss.logging:jboss-logging:3.3.2.Final" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jboss.logging/jboss-logging/3.3.2.Final/3789d00e859632e6c6206adc0c71625559e6e3b0/jboss-logging-3.3.2.Final.jar!/" />
     </CLASSES>

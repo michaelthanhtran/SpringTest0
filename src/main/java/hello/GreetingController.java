@@ -1,7 +1,15 @@
 package hello;
 
 
+import datadog.trace.api.DDTags;
+import io.opentracing.Scope;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
+import io.opentracing.util.GlobalTracer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +25,8 @@ import java.util.Map;
 @RestController
 public class GreetingController {
 
+    @Value("#{environment['sleeptime'] ?: '2000'}")
+    private long sleepTime;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -24,6 +34,9 @@ public class GreetingController {
     @Autowired
     HttpServletRequest request;
 
+    private static final Logger logger = LoggerFactory.getLogger(GreetingController.class);
+    private final Tracer tracer = GlobalTracer.get();
+    // private final Span span =
 
     @RequestMapping("/ServiceC")
     public String serviceC() throws InterruptedException {
@@ -35,12 +48,24 @@ public class GreetingController {
         HttpHeaders header = new HttpHeaders();
         header.setAll(map);
 
+        // Scope scope = tracer.activateSpan();
         //Sleep
         Thread.sleep(250L);
+        /*try (Scope scope1 = tracer.buildSpan("<name of the span >").asChildOf(scope.span()).startActive(true)) {
+            scope1.span().setTag(DDTags.SERVICE_NAME, "<name of the service>");
+            // Whatever activity you would think of...
+        }*/
+
+
+
+        logger.info("In Service C ***************");
+        // logger.info(doSomeStuff("doSomeStuff inside Service C"));
+        // doSomeOtherStuff("doSomeOtherStuff inside Service C");
+        // Thread.sleep(sleepTime);
+        // logger.info("Sleeping inside Service C **************");
 
         //Post to downstream service
         String rs = restTemplate.postForEntity("http://localhost:9393/ServiceD", new HttpEntity(header), String.class).getBody();
-
         return rs;
     }
 
@@ -59,9 +84,19 @@ public class GreetingController {
         }
 
         Thread.sleep(230L);
+        logger.info("In Service D ***************");
 
         return "Service D\n";
     }
 
+    private String doSomeStuff(String somestring) throws InterruptedException {
+        String helloStr = String.format("Hello, %s!", somestring);
+        Thread.sleep(sleepTime);
+        return helloStr;
+    }
 
+    private void doSomeOtherStuff(String somestring) throws InterruptedException {
+        System.out.println(somestring);
+        Thread.sleep(sleepTime);
+    }
 }

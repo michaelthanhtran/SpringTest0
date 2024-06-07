@@ -1,6 +1,8 @@
 package hello;
 
 
+import datadog.opentracing.DDTracer;
+import io.opentracing.util.GlobalTracer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -18,7 +20,10 @@ public class Application {
     }
 
     public static void main(String[] args) {
-
+        DDTracer tracer = new DDTracer();
+        GlobalTracer.registerIfAbsent(tracer);
+        // register the same tracer with the Datadog API
+        datadog.trace.api.GlobalTracer.registerIfAbsent(tracer);
         SpringApplication.run(Application.class, args);
     }
 }
