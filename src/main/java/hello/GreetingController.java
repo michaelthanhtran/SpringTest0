@@ -36,7 +36,6 @@ public class GreetingController {
 
     private static final Logger logger = LoggerFactory.getLogger(GreetingController.class);
     private final Tracer tracer = GlobalTracer.get();
-    // private final Span span =
 
     @RequestMapping("/ServiceC")
     public String serviceC() throws InterruptedException {
@@ -48,22 +47,21 @@ public class GreetingController {
         HttpHeaders header = new HttpHeaders();
         header.setAll(map);
 
-        // Scope scope = tracer.activateSpan();
+
         //Sleep
         Thread.sleep(250L);
-        /*try (Scope scope1 = tracer.buildSpan("<name of the span >").asChildOf(scope.span()).startActive(true)) {
-            scope1.span().setTag(DDTags.SERVICE_NAME, "<name of the service>");
-            // Whatever activity you would think of...
-        }*/
-
-
 
         logger.info("In Service C ***************");
-        // logger.info(doSomeStuff("doSomeStuff inside Service C"));
-        // doSomeOtherStuff("doSomeOtherStuff inside Service C");
-        // Thread.sleep(sleepTime);
-        // logger.info("Sleeping inside Service C **************");
+        Span span = tracer.buildSpan("Service C").start();
+        span.setTag(DDTags.SERVICE_NAME, "springtest0");
 
+        try (Scope scope = tracer.scopeManager().activate(span, true)) {
+            doSomeStuff("doSomeStuff from Service C", scope);
+            Thread.sleep(sleepTime);
+            doSomeOtherStuff("doSomeOtherStuff from Service C", scope);
+            Thread.sleep(sleepTime);
+        }
+        
         //Post to downstream service
         String rs = restTemplate.postForEntity("http://localhost:9393/ServiceD", new HttpEntity(header), String.class).getBody();
         return rs;
@@ -89,14 +87,19 @@ public class GreetingController {
         return "Service D\n";
     }
 
-    private String doSomeStuff(String somestring) throws InterruptedException {
-        String helloStr = String.format("Hello, %s!", somestring);
-        Thread.sleep(sleepTime);
-        return helloStr;
+    private void doSomeStuff(String somestring, Scope scope) throws InterruptedException {
+        try (Scope scope1 = tracer.buildSpan("doSomeStuff").asChildOf(scope.span()).startActive(true)) {
+            scope1.span().setTag(DDTags.SERVICE_NAME, "springtest0");
+            System.out.println(somestring);
+            Thread.sleep(sleepTime);
+        }
     }
 
-    private void doSomeOtherStuff(String somestring) throws InterruptedException {
-        System.out.println(somestring);
-        Thread.sleep(sleepTime);
+    private void doSomeOtherStuff(String somestring, Scope scope) throws InterruptedException {
+        try (Scope scope1 = tracer.buildSpan("doSomeOtherStuff").asChildOf(scope.span()).startActive(true)) {
+            scope1.span().setTag(DDTags.SERVICE_NAME, "springtest0");
+            System.out.println(somestring);
+            Thread.sleep(sleepTime);
+        }
     }
 }

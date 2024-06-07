@@ -32,8 +32,8 @@ test {
 
 
 dependencies {
-    compile group: 'io.opentracing', name: 'opentracing-api', version: "0.32.0"
-    compile group: 'io.opentracing', name: 'opentracing-util', version: "0.32.0"
+    compile group: 'io.opentracing', name: 'opentracing-api', version: "0.31.0"
+    compile group: 'io.opentracing', name: 'opentracing-util', version: "0.31.0"
     compile group: 'com.datadoghq', name: 'dd-trace-api', version: "0.22.0"
 // Datadog OpenTracing bridge (only needed if you do not use dd-java-agent for autoinstrumentation)
     compile group: 'com.datadoghq', name: 'dd-trace-ot', version: "0.22.0"
