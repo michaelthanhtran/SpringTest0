@@ -20,10 +20,10 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        DDTracer tracer = new DDTracer();
+        /*DDTracer tracer = new DDTracer();
         GlobalTracer.register(tracer);
         // register the same tracer with the Datadog API
-        datadog.trace.api.GlobalTracer.registerIfAbsent(tracer);
+        datadog.trace.api.GlobalTracer.registerIfAbsent(tracer);*/
         SpringApplication.run(Application.class, args);
     }
 }
